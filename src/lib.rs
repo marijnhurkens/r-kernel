@@ -1,4 +1,3 @@
-// src/lib.rs
 
 #![no_std] // don't link the Rust standard library
 
@@ -15,7 +14,6 @@ extern crate array_init;
 #[cfg(test)]
 extern crate std;
 
-// NEW: We need to add `pub` here to make them accessible from the outside
 pub mod vga_buffer;
 pub mod serial;
 
