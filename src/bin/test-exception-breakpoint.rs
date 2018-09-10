@@ -25,6 +25,7 @@ pub extern "C" fn _start() -> ! {
     // invoke a breakpoint exception
     x86_64::instructions::int3();
 
+    // Load the breakpoint called static integer and check if equal to 1
     match BREAKPOINT_HANDLER_CALLED.load(Ordering::SeqCst) {
         1 => serial_println!("ok"),
         0 => {
@@ -58,6 +59,7 @@ pub fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
+// Import the IDT structures and create the IDT
 use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
 lazy_static! {
@@ -72,7 +74,7 @@ pub fn init_idt() {
     IDT.load();
 }
 
-
+// Handle the breakpoint (increment the handler called static integer)
 extern "x86-interrupt" fn breakpoint_handler(_: &mut ExceptionStackFrame) {
     BREAKPOINT_HANDLER_CALLED.fetch_add(1, Ordering::SeqCst);
 }
