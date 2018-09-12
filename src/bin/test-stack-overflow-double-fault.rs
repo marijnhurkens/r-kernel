@@ -16,9 +16,8 @@ use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
 #[cfg(not(test))]
 #[no_mangle]
+#[allow(unconditional_recursion)]
 pub extern "C" fn _start() -> ! {
-    println!("Hello World{}", "!");
-
     rust_kernel::gdt::init();
     init_idt();
 
@@ -62,10 +61,13 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: &mut ExceptionStackFra
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
 }
 
+use rust_kernel::exit_qemu;
+
 extern "x86-interrupt" fn double_fault_handler(
-    stack_frame: &mut ExceptionStackFrame,
+    _stack_frame: &mut ExceptionStackFrame,
     _error_code: u64,
 ) {
-    println!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+    serial_println!("ok");
+    unsafe {exit_qemu();}
     loop {}
 }
