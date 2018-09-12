@@ -4,6 +4,7 @@
 #![cfg_attr(not(test), no_main)] // disable all Rust-level entry points
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
 
+extern crate cpuio;
 extern crate x86_64;
 
 #[macro_use]
@@ -12,6 +13,7 @@ extern crate rust_kernel;
 extern crate lazy_static;
 
 use core::panic::PanicInfo;
+use rust_kernel::interrupts;
 use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
 #[cfg(not(test))]
@@ -21,12 +23,8 @@ pub extern "C" fn _start() -> ! {
 
     rust_kernel::gdt::init();
     init_idt();
-
-    fn stack_overflow() {
-        stack_overflow(); // for each recursion, the return address is pushed
-    }
-
-    stack_overflow();
+    unsafe { interrupts::PICS.lock().initialize() };
+    x86_64::instructions::interrupts::enable();
 
     println!("It did not crash!");
     loop {}
@@ -50,6 +48,13 @@ lazy_static! {
                 .set_handler_fn(double_fault_handler)
                 .set_stack_index(rust_kernel::gdt::DOUBLE_FAULT_IST_INDEX);
         }
+
+        let timer_interrupt_id = usize::from(interrupts::TIMER_INTERRUPT_ID);
+        idt[timer_interrupt_id].set_handler_fn(timer_interrupt_handler);
+
+        let keyboard_interrupt_id = usize::from(interrupts::KEYBOARD_INTERRUPT_ID);
+        idt[keyboard_interrupt_id].set_handler_fn(keyboard_interrupt_handler);
+
         idt
     };
 }
@@ -68,4 +73,29 @@ extern "x86-interrupt" fn double_fault_handler(
 ) {
     println!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
     loop {}
+}
+
+extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
+    print!(".");
+    unsafe {
+        interrupts::PICS
+            .lock()
+            .notify_end_of_interrupt(interrupts::TIMER_INTERRUPT_ID)
+    }
+}
+
+extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
+    let mut scancode: u8 = 0;
+
+    unsafe {
+        scancode = cpuio::UnsafePort::new(0x60).read();
+    };
+
+    print!("{}", scancode);
+
+    unsafe {
+        interrupts::PICS
+            .lock()
+            .notify_end_of_interrupt(interrupts::KEYBOARD_INTERRUPT_ID)
+    }
 }
