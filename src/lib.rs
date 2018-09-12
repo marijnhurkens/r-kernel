@@ -1,4 +1,9 @@
 
+//! # Tets rust kernel
+//! 
+//! This file makes it possible to use the kernel as a library
+//! which is convinient for testing.
+
 #![no_std] // don't link the Rust standard library
 
 extern crate bootloader_precompiled;
@@ -14,8 +19,11 @@ extern crate array_init;
 #[cfg(test)]
 extern crate std;
 
+// Export the modules
+pub mod gdt;
 pub mod vga_buffer;
 pub mod serial;
+
 
 pub unsafe fn exit_qemu() {
     use x86_64::instructions::port::Port;
