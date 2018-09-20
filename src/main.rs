@@ -1,10 +1,9 @@
 #![feature(abi_x86_interrupt)]
-#![feature(panic_handler)] // required for defining the panic handler
 #![no_std] // don't link the Rust standard library
 #![cfg_attr(not(test), no_main)] // disable all Rust-level entry points
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
 
-extern crate cpuio;
+extern crate bootloader_precompiled;
 extern crate x86_64;
 
 #[macro_use]
@@ -12,22 +11,37 @@ extern crate rust_kernel;
 #[macro_use]
 extern crate lazy_static;
 
+use bootloader_precompiled::bootinfo::BootInfo;
 use core::panic::PanicInfo;
 use rust_kernel::interrupts;
+use rust_kernel::device::keyboard;
+use x86_64::instructions::port::Port;
 use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
 #[cfg(not(test))]
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
-    println!("Hello World{}", "!");
+pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
+    println!("Rust test kernel starting{}", "!");
 
     rust_kernel::gdt::init();
     init_idt();
     unsafe { interrupts::PICS.lock().initialize() };
     x86_64::instructions::interrupts::enable();
 
+    if boot_info.check_version().is_err() {
+        panic!("os_bootinfo version passed by bootloader does not match crate version!");
+    }
+    print_boot_info(boot_info);
+
     println!("It did not crash!");
-    loop {}
+
+    //x86_64::instructions::int3();
+    //x86_64::instructions::hlt();
+    loop{
+        use rust_kernel::arch::interrupts;
+
+        interrupts::pause();
+    }
 }
 
 /// This function is called on panic.
@@ -63,6 +77,12 @@ pub fn init_idt() {
     IDT.load();
 }
 
+pub fn print_boot_info(boot_info: &'static BootInfo) {
+    println!("P4 table addr: 0x{:X}", boot_info.p4_table_addr);
+    println!("Memory map entries: {:?} ", boot_info.memory_map);
+    //println!("test: {:?}", boot_info.memory_map.entries[0])
+}
+
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: &mut ExceptionStackFrame) {
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
 }
@@ -76,7 +96,7 @@ extern "x86-interrupt" fn double_fault_handler(
 }
 
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
-    print!(".");
+    //print!(".");
     unsafe {
         interrupts::PICS
             .lock()
@@ -85,13 +105,15 @@ extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut ExceptionSt
 }
 
 extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
-    let mut scancode: u8 = 0;
+    let scancodeport = Port::new(0x60);
 
-    unsafe {
-        scancode = cpuio::UnsafePort::new(0x60).read();
-    };
+    let scancode: u8 = unsafe { scancodeport.read() };
 
-    print!("{}", scancode);
+    println!("Scancode: {:X}", scancode);
+    let mut keyboard_guard = keyboard::KEYBOARD.lock();
+    let key_press = keyboard_guard.process_scancode(scancode).unwrap();
+
+    println!("{:?}", key_press);
 
     unsafe {
         interrupts::PICS

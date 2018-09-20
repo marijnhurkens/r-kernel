@@ -1,4 +1,3 @@
-#![feature(panic_handler)]
 #![no_std]
 #![cfg_attr(not(test), no_main)]
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]

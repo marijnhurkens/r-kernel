@@ -3,6 +3,9 @@ extern crate pic8259_simple;
 use pic8259_simple::ChainedPics;
 use spin;
 
+/// A general rule is to reserve the first 32
+/// interrupt vectors for exceptions. PIC 1 will use the 33nd interrupt
+/// vector.
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
