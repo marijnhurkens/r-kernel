@@ -23,7 +23,7 @@ pub fn init() {
 /// Create static TSS, create the IST and include 
 /// the double fault stack in the 0th enty of the IST
 lazy_static! {
-    static ref TSS:TaskStateSegment = {
+    static ref TSS: TaskStateSegment = {
         let mut tss = TaskStateSegment::new();
         tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX as usize] = {
             const STACK_SIZE: usize = 4096;
