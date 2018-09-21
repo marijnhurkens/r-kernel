@@ -24,6 +24,7 @@ extern crate std;
 
 // Export the modules
 pub mod gdt;
+#[macro_use]
 pub mod vga_buffer;
 pub mod serial;
 pub mod interrupts;

@@ -5,33 +5,39 @@
 
 extern crate bootloader_precompiled;
 extern crate x86_64;
-
 #[macro_use]
 extern crate rust_kernel;
 #[macro_use]
 extern crate lazy_static;
 
-use bootloader_precompiled::bootinfo::BootInfo;
 use core::panic::PanicInfo;
 use rust_kernel::interrupts;
 use rust_kernel::device::keyboard;
+use rust_kernel::arch;
 use x86_64::instructions::port::Port;
 use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
+/// The kernel is compiled using the bootimage and bootloader crates.
+/// The bootloader crate contains the rather difficult setup for x86_64, 
+/// this includes setting up long mode (64 bit), enabling paging and various
+/// other things. The bootimage crate compiles bot the bootloader and the 
+/// kernel and appends the kernel to the bootloader. The bootloader ensures 
+/// that the _start function is called when it's finished.
 #[cfg(not(test))]
 #[no_mangle]
-pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
+pub extern "C" fn _start(boot_info_address: usize) -> ! {
     println!("Rust test kernel starting{}", "!");
+
+    // Lets init, currently only x86_64 is supported.
+    arch::init(boot_info_address);
 
     rust_kernel::gdt::init();
     init_idt();
     unsafe { interrupts::PICS.lock().initialize() };
     x86_64::instructions::interrupts::enable();
 
-    if boot_info.check_version().is_err() {
-        panic!("os_bootinfo version passed by bootloader does not match crate version!");
-    }
-    print_boot_info(boot_info);
+
+    
 
     println!("It did not crash!");
 
@@ -77,11 +83,6 @@ pub fn init_idt() {
     IDT.load();
 }
 
-pub fn print_boot_info(boot_info: &'static BootInfo) {
-    println!("P4 table addr: 0x{:X}", boot_info.p4_table_addr);
-    println!("Memory map entries: {:?} ", boot_info.memory_map);
-    //println!("test: {:?}", boot_info.memory_map.entries[0])
-}
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: &mut ExceptionStackFrame) {
     println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
