@@ -4,7 +4,7 @@ use x86_64::structures::paging::{
 };
 
 pub struct AreaFrameAllocator {
-    memory_map: MemoryMap,
+    pub memory_map: MemoryMap,
 }
 
 /// Use the boot info memory map to create a area frame allocator
@@ -24,7 +24,7 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
         // Find the next region with type usable
         let region = &mut self.memory_map
             .iter_mut()
-            .filter(|region| region.region_type == MemoryRegionType::Usable)
+            .filter(|region| region.region_type == MemoryRegionType::Usable && (region.range.end_frame_number - region.range.start_frame_number) > 1)
             .next();
 
         // Find the associated frames or error if no region could be found.
@@ -32,11 +32,16 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
         // See: https://github.com/rust-osdev/os_bootinfo/blob/master/src/memory_map.rs#L103
         //
         // The region is borrowed.
+        
         let frame_range: &mut FrameRange = &mut region
             .as_mut()
             .expect("Could not find usable memory region")
             .range;
 
+        // if frame_range.start_frame_number == frame_range.end_frame_number {
+        //     let type = &mut region.as_mut().expect("Could not find usable memory region").region_type;
+        //     type = &mut MemoryRegionType::InUse;
+        // }
         /* Convert the frame range, which consists of the start and end memory addresses, to the physical frames.
            We now have a struct containing the start and end memory addresses of the frame range.
 
@@ -76,8 +81,14 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
             Finally we return the allocated PhysFrame.
         */
         if let Some(frame) = phys_range.next() {
+            // println!(
+            //     "Allocating fr num: {}, end: {}, frame: {:?}",
+            //     frame_range.start_frame_number, frame_range.end_frame_number, frame
+            // );
+
             frame_range.start_frame_number =
                 phys_range.start.start_address().as_u64() / frame.size();
+
             Some(frame)
         } else {
             None

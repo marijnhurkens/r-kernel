@@ -5,8 +5,9 @@ use core::ptr::NonNull;
 use linked_list_allocator::Heap;
 use spin::Mutex;
 
-pub const HEAP_START: u64 = 0o_000_001_000_000_0000;
-pub const HEAP_SIZE: u64 = 1024 * 1024; // = 1 MB
+//pub const HEAP_START: u64 = 0o_000_001_000_000_0000;
+pub const HEAP_START: u64 = 0o_010_000_000_000_0000;
+pub const HEAP_SIZE: u64 = 1024 * 1024 * 10; // 10 MB 
 
 pub struct HeapAllocator {
     inner: Mutex<Heap>,
@@ -34,6 +35,8 @@ impl HeapAllocator {
 /// Wrappers for inner Alloc implementation
 unsafe impl GlobalAlloc for HeapAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        //println!("Allocating {} bytes", layout.size());
+
         self.inner
             .lock()
             .alloc(layout)
@@ -43,6 +46,8 @@ unsafe impl GlobalAlloc for HeapAllocator {
 
     #[inline]
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        //println!("Freeing {} bytes", layout.size());
+
         self.inner
             .lock()
             .dealloc(NonNull::new_unchecked(ptr), layout);

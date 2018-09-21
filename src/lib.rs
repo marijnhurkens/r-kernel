@@ -44,9 +44,11 @@ pub unsafe fn exit_qemu() {
     port.write(0);
 }
 
+// Do not include when testing, std has an alloc handler :)
+#[cfg(not(test))]
 #[alloc_error_handler]
 pub fn rust_oom(info: core::alloc::Layout) -> ! {
-    panic!("{:?}", info);
+    panic!("Error allocating {} bytes with alignment {}. Out of memory?", info.size(), info.align());
 }
 
 use arch::memory::heap::HeapAllocator;

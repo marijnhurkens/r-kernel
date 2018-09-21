@@ -12,6 +12,7 @@ extern crate lazy_static;
 extern crate alloc;
 
 use alloc::string::String;
+use alloc::vec::Vec;
 use core::panic::PanicInfo;
 use rust_kernel::arch;
 use rust_kernel::device::keyboard;
@@ -40,17 +41,18 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
     x86_64::instructions::interrupts::enable();
 
     let mut t = String::from("test");
-    let t2 = String::from("Another longer string");
 
     println!("It did not crash!");
     println!("String contents: {}", t);
-    println!("String len: {}", t.len());
     println!("String ptr: {:?}", t.as_ptr());
-    println!("String t2 ptr: {:?}", t2.as_ptr());
 
-    t.push_str("overschrijven?");
+    const vecsize: usize = 1024 * 1024 * 9;
+    let mut a: Vec<u8> = Vec::with_capacity(vecsize);
+    for i in 0..vecsize {
+        a.push(i as u8);
+    }
 
-    println!("String ptr: {:?}", t.as_ptr());
+    println!("Allocated vec of size {}", vecsize);
 
     //x86_64::instructions::int3();
     //x86_64::instructions::hlt();

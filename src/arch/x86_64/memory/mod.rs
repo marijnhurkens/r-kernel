@@ -28,12 +28,15 @@ pub fn init<'a>(
     // Subtract one to get the last frame.
     let heap_end_page = Page::containing_address(VirtAddr::new(HEAP_START + HEAP_SIZE - 1));
 
+    println!("Allocating heap");
     // Map the heap
     for page in Page::range_inclusive(heap_start_page, heap_end_page) {
         let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::NO_EXECUTE;
         map_page(page, flags, &mut recursive_page_table, &mut frame_allocator)
             .expect("Heap page mapping failed");
     }
+
+    println!("Memory map \n{:?}", frame_allocator.memory_map);
 
     println!("HEAP start page: {:?}", heap_start_page);
     println!("HEAP start virt addr: {:?}", heap_start_page.start_address());
