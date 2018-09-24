@@ -1,5 +1,4 @@
 #![feature(abi_x86_interrupt)]
-
 #![no_std] // don't link the Rust standard library
 #![cfg_attr(not(test), no_main)] // disable all Rust-level entry points
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
@@ -11,16 +10,19 @@ extern crate rust_kernel;
 #[macro_use]
 extern crate lazy_static;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::panic::PanicInfo;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use rust_kernel::exit_qemu;
+use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
 static BREAKPOINT_HANDLER_CALLED: AtomicUsize = AtomicUsize::new(0);
 
 #[cfg(not(test))]
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
-    init_idt();
+pub extern "C" fn _start(boot_info_address: usize) -> ! {
+    rust_kernel::arch::init(boot_info_address);
+
+    IDT.load();
 
     // invoke a breakpoint exception
     x86_64::instructions::int3();
@@ -59,8 +61,7 @@ pub fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
-// Import the IDT structures and create the IDT
-use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
+
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -70,9 +71,6 @@ lazy_static! {
     };
 }
 
-pub fn init_idt() {
-    IDT.load();
-}
 
 // Handle the breakpoint (increment the handler called static integer)
 extern "x86-interrupt" fn breakpoint_handler(_: &mut ExceptionStackFrame) {

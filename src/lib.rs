@@ -3,8 +3,8 @@
 //! This file makes it possible to use the kernel as a library
 //! which is convinient for testing.
 
-#![feature(asm, alloc, allocator_api, alloc_error_handler, min_const_fn)]
 #![no_std] // don't link the Rust standard library
+#![feature(abi_x86_interrupt, asm, alloc, allocator_api, alloc_error_handler, min_const_fn)]
 
 extern crate bootloader_precompiled;
 extern crate linked_list_allocator;
@@ -13,8 +13,6 @@ extern crate spin;
 extern crate uart_16550;
 extern crate volatile;
 extern crate x86_64;
-
-#[macro_use]
 extern crate alloc;
 
 #[macro_use]
@@ -29,13 +27,13 @@ extern crate array_init;
 extern crate std;
 
 // Export the modules
-pub mod gdt;
 #[macro_use]
 pub mod vga_buffer;
+
 pub mod arch;
 pub mod device;
-pub mod interrupts;
 pub mod serial;
+
 
 pub unsafe fn exit_qemu() {
     use x86_64::instructions::port::Port;
@@ -48,7 +46,11 @@ pub unsafe fn exit_qemu() {
 #[cfg(not(test))]
 #[alloc_error_handler]
 pub fn rust_oom(info: core::alloc::Layout) -> ! {
-    panic!("Error allocating {} bytes with alignment {}. Out of memory?", info.size(), info.align());
+    panic!(
+        "Error allocating {} bytes with alignment {}. Out of memory?",
+        info.size(),
+        info.align()
+    );
 }
 
 use arch::memory::heap::HeapAllocator;

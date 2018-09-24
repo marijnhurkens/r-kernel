@@ -1,13 +1,14 @@
 use bootloader_precompiled::bootinfo::BootInfo;
 use x86_64::structures::paging::{PageTable, RecursivePageTable};
 
+pub mod gdt;
+pub mod idt;
 pub mod interrupts;
 pub mod memory;
+mod device;
 
 /// Initialize for the x86_64 architecture
 pub fn init(boot_info_addres: usize) {
-    use self::memory::heap::{HEAP_SIZE, HEAP_START};
-
     // We get an address to the boot info from the bootloader, let's cast
     // it to a struct.
     let _boot_info: &BootInfo = unsafe { &*(boot_info_addres as *mut BootInfo) };
@@ -16,13 +17,6 @@ pub fn init(boot_info_addres: usize) {
     // version. This verison must match the crate we use in the kernel.
     if _boot_info.check_version().is_err() {
         panic!("os_bootinfo version passed by bootloader does not match crate version!");
-    }
-
-    println!("HEAP START = 0x{:X}", HEAP_START);
-    println!("HEAP END = 0x{:X}", HEAP_START + HEAP_SIZE);
-
-    for region in _boot_info.memory_map.iter() {
-        println!("{:?}", region)
     }
 
     // Use the p4 page table address found in the boot info and
@@ -44,4 +38,7 @@ pub fn init(boot_info_addres: usize) {
         ::HEAP_ALLOCATOR.init(HEAP_START as usize, HEAP_SIZE as usize);
     }
 
+    gdt::init();
+    idt::init();
+    device::init();
 }
