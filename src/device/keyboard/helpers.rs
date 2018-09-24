@@ -49,6 +49,15 @@ pub enum Modifier {
     ShiftRight(bool),
 }
 
+// All the other special keys
+#[derive(Debug, Copy, Clone)]
+pub enum Other {
+    ArrowLeft(bool),
+    ArrowRight(bool),
+    ArrowUp(bool),
+    ArrowDown(bool),
+}
+
 // Global modifier key state
 pub struct ModifierState {
     alt: KeyPair,
@@ -112,6 +121,7 @@ pub enum Key {
     Ascii(u8),
     Meta(Modifier),
     LowerAscii(u8),
+    Special(Other),
 }
 
 

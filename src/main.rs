@@ -52,6 +52,8 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
         if let Some(key) = KEYBOARD.lock().process_scancode() {
             if let Some(character) = key.character {
                 print!("{}", character);
+            } else {
+                println!("{:?}", key)
             }
         }
 

@@ -5,6 +5,7 @@ use spin::Mutex;
 
 use device::keyboard::helpers::Key::*;
 use device::keyboard::helpers::Modifier::*;
+use device::keyboard::helpers::Other::*;
 use device::keyboard::helpers::{Key, KeyEvent, STATE};
 
 #[macro_use]
@@ -14,16 +15,21 @@ pub struct Keyboard {
     scancode_buffer: VecDeque<u8>,
 }
 
-fn get_key(scancode: u64) -> Option<Key> {
-    match get_key_event(scancode) {
+// Removes keyevent layer -> key
+fn get_key(scancode: u64, scancode_2: Option<u64>) -> Option<Key> {
+    if let Some(scancode_2) = scancode_2 {
+        return match match_special_scancode(scancode_2) {
+            Some(KeyEvent::Pressed(key)) => Some(key),
+            Some(KeyEvent::Released(key)) => Some(key),
+            _ => None,
+        };
+    }
+
+    return match match_scancode(scancode) {
         Some(KeyEvent::Pressed(key)) => Some(key),
         Some(KeyEvent::Released(key)) => Some(key),
         _ => None,
-    }
-}
-
-fn get_key_event(scancode: u64) -> Option<KeyEvent> {
-    match_scancode(scancode)
+    };
 }
 
 #[derive(Debug)]
@@ -39,17 +45,27 @@ impl Keyboard {
             None => return None,
         };
 
-        // If multibyte todo: implement
+        // If multibyte search for the special code
         if scancode == 0xE0 || scancode == 0xE1 {
             let scancode_2 = match self.scancode_buffer.pop_front() {
-                Some(scancode) => scancode,
+                Some(scancode_2) => scancode_2,
                 None => return None,
             };
 
-            return None;
+            let key = match get_key(scancode as u64, Some(scancode_2 as u64)) {
+                Some(key) => key,
+                None => return None,
+            };
+
+            let key_package = KeyPackage {
+                key: key,
+                character: None,
+            };
+
+            return Some(key_package);
         }
 
-        let key = match get_key(scancode as u64) {
+        let key = match get_key(scancode as u64, None) {
             Some(key) => key,
             None => return None,
         };
@@ -64,6 +80,7 @@ impl Keyboard {
             Key::LowerAscii(lower) => {
                 character = Some(STATE.lock().apply_to(lower) as char);
             }
+            Key::Special(_) => {}
         }
 
         let key_package = KeyPackage {
@@ -120,6 +137,20 @@ fn match_scancode(scancode: u64) -> Option<KeyEvent> {
         0xE09D => key_release!(Meta(ControlRight(false))),
         0xB8 => key_release!(Meta(AltLeft(false))),
         0xE0B8 => key_release!(Meta(AltRight(false))),
+
+        _ => None,
+    }
+}
+
+fn match_special_scancode(scancode_2: u64) -> Option<KeyEvent> {
+    let idx = scancode_2 as usize;
+
+    match scancode_2 {
+        // Arrow keys
+        0x48 => key_press!(Special(ArrowUp(true))),
+        0x50 => key_press!(Special(ArrowDown(true))),
+        0x4B => key_press!(Special(ArrowLeft(true))),
+        0x4D => key_press!(Special(ArrowRight(true))),
 
         _ => None,
     }
