@@ -14,7 +14,7 @@ use rust_kernel::exit_qemu;
 #[cfg(not(test))]
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
-    println!("Test");
+    kprintln!("Test");
     serial_println!("ok");
 
     unsafe { exit_qemu(); }

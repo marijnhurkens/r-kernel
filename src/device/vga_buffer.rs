@@ -1,6 +1,7 @@
 //! # VGA buffer interface
 //!
 //!  Interface to write to the VGA buffer.
+#[macro_use]
 use core::fmt;
 use spin::Mutex;
 use volatile::Volatile;
@@ -207,6 +208,25 @@ macro_rules! println {
     () => (print!("\n"));
     ($fmt:expr) => (print!(concat!( $fmt, "\n")));
     ($fmt:expr, $($arg:tt)*) => (print!(concat!( $fmt, "\n"), $($arg)*));
+}
+
+#[macro_export]
+macro_rules! kprintln {
+    () => (print!("\n"));
+    ($fmt:expr) => {
+        if $crate::HEAP_ALLOCATOR.get_status() {
+            println!(concat!("[ {:>4.4} ] ", $fmt), $crate::time::TIME.get_seconds())
+        } else {
+            println!(concat!("[ no time ] ", $fmt))
+        }
+    };
+    ($fmt:expr, $($arg:tt)*) => {
+         if $crate::HEAP_ALLOCATOR.get_status() {
+            println!(concat!("[ {:>4.4} ] ", $fmt), $crate::time::TIME.get_seconds(), $($arg)*)
+         } else {
+            println!(concat!("[ no time ] ", $fmt), $($arg)*)
+         }
+    };
 }
 
 pub fn print(args: fmt::Arguments) {

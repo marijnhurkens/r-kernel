@@ -27,7 +27,7 @@ pub extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: &mut Exce
     keyboard_guard.queue_scancode(scancode);
 
 
-    //println!("Keypress {:?}", key_press);
+    //kprintln!("Keypress {:?}", key_press);
 
     unsafe {
         pic8259::PICS

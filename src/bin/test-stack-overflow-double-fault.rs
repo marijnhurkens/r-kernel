@@ -28,7 +28,7 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
 
     stack_overflow();
 
-    println!("It did not crash!");
+    kprintln!("It did not crash!");
     loop {}
 }
 
@@ -37,7 +37,7 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
 #[panic_handler]
 #[no_mangle]
 pub fn panic(info: &PanicInfo) -> ! {
-    println!("{}", info);
+    kprintln!("{}", info);
     loop {}
 }
 

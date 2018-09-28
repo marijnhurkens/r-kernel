@@ -2,15 +2,17 @@ pub mod bump_allocator;
 
 use core::alloc::{Alloc, GlobalAlloc, Layout};
 use core::ptr::NonNull;
+use core::sync::atomic::{Ordering, AtomicBool};
 use linked_list_allocator::Heap;
 use spin::Mutex;
 
 //pub const HEAP_START: u64 = 0o_000_001_000_000_0000;
 pub const HEAP_START: u64 = 0o_010_000_000_000_0000;
-pub const HEAP_SIZE: u64 = 1024 * 1024 * 10; // 10 MB 
+pub const HEAP_SIZE: u64 = 1024 * 1024 * 10; // 10 MB
 
 pub struct HeapAllocator {
     inner: Mutex<Heap>,
+    status: AtomicBool,
 }
 
 impl HeapAllocator {
@@ -18,6 +20,7 @@ impl HeapAllocator {
     pub const fn new() -> Self {
         HeapAllocator {
             inner: Mutex::new(Heap::empty()),
+            status: AtomicBool::new(false),
         }
     }
 
@@ -29,13 +32,18 @@ impl HeapAllocator {
     /// empty heap.
     pub unsafe fn init(&self, heap_bottom: usize, heap_size: usize) {
         self.inner.lock().init(heap_bottom, heap_size);
+        self.status.store(true, Ordering::SeqCst);
+    }
+
+    pub fn get_status(&self) -> bool {
+        self.status.load(Ordering::SeqCst)
     }
 }
 
 /// Wrappers for inner Alloc implementation
 unsafe impl GlobalAlloc for HeapAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        //println!("Allocating {} bytes", layout.size());
+        //kprintln!("Allocating {} bytes", layout.size());
 
         self.inner
             .lock()
@@ -46,7 +54,7 @@ unsafe impl GlobalAlloc for HeapAllocator {
 
     #[inline]
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        //println!("Freeing {} bytes", layout.size());
+        //kprintln!("Freeing {} bytes", layout.size());
 
         self.inner
             .lock()

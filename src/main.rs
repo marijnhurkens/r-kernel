@@ -26,29 +26,32 @@ use rust_kernel::device::keyboard::KEYBOARD;
 #[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn _start(boot_info_address: usize) -> ! {
-    println!("Rust test kernel starting{}", "...");
+    kprintln!("Rust test kernel starting{}", "...");
+    kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());
 
     // Let's init, currently only x86_64 is supported.
     arch::init(boot_info_address);
 
+    kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());
+
     let t = String::from("test");
 
-    println!("Test string contents: {}", t);
-    println!("Test string ptr: {:?}", t.as_ptr());
+    kprintln!("Test string contents: {}", t);
+    kprintln!("Test string ptr: {:?}", t.as_ptr());
 
     const VECSIZE: usize = 1024 * 1024 * 1;
     let mut a: Vec<u8> = Vec::with_capacity(VECSIZE);
 
-    println!("Allocated vec of size {}", VECSIZE);
+    kprintln!("Allocated vec of size {}", VECSIZE);
 
     for i in 0..VECSIZE {
         a.push(i as u8);
     }
 
-    println!("Pushed ints to vec.");
-    println!("Done... to main loop.");
+    kprintln!("Pushed ints to vec.");
+    kprintln!("Done... to main loop.");
 
-    //println!("{}", rust_kernel::time::TIME.lock().ticks);
+    //kprintln!("{}", rust_kernel::time::TIME.lock().ticks);
 
     // Todo:
     // - time system
@@ -68,13 +71,13 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
             if let Some(character) = key.character {
                 print!("{}", character);
             } else {
-                println!("{:?}", key);
+                kprintln!("{:?}", key);
             }
         }
         
-        println!(
-            "Time: {}", (rust_kernel::time::TIME.get_seconds())
-        );
+        // kprintln!(
+        //     "Time: {}", (rust_kernel::time::TIME.get_seconds())
+        // );
 
 
        interrupts::pause();
@@ -86,6 +89,6 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
 #[panic_handler]
 #[no_mangle]
 pub fn panic(info: &PanicInfo) -> ! {
-    println!("{}", info);
+    kprintln!("{}", info);
     loop {}
 }

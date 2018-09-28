@@ -55,5 +55,6 @@ pub fn rust_oom(info: core::alloc::Layout) -> ! {
 
 use arch::memory::heap::HeapAllocator;
 
+// Todo: make private
 #[global_allocator]
-static HEAP_ALLOCATOR: HeapAllocator = HeapAllocator::new();
+pub static HEAP_ALLOCATOR: HeapAllocator = HeapAllocator::new();

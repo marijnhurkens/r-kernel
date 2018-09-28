@@ -81,7 +81,7 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
             Finally we return the allocated PhysFrame.
         */
         if let Some(frame) = phys_range.next() {
-            // println!(
+            // kprintln!(
             //     "Allocating fr num: {}, end: {}, frame: {:?}",
             //     frame_range.start_frame_number, frame_range.end_frame_number, frame
             // );

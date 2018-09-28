@@ -21,8 +21,8 @@ pub fn init<'a>(
 ) -> MemoryController<'a> {
     assert_has_not_been_called!("Memory should only be initialized once!");
 
-    println!("HEAP START = 0x{:X}", HEAP_START);
-    println!("HEAP END = 0x{:X}", HEAP_START + HEAP_SIZE);
+    kprintln!("HEAP START = 0x{:X}", HEAP_START);
+    kprintln!("HEAP END = 0x{:X}", HEAP_START + HEAP_SIZE);
 
     let mut frame_allocator = AreaFrameAllocator::new(&_boot_info.memory_map);
 
@@ -30,7 +30,7 @@ pub fn init<'a>(
     // Subtract one to get the last frame.
     let heap_end_page = Page::containing_address(VirtAddr::new(HEAP_START + HEAP_SIZE - 1));
 
-    println!("Mapping kernel heap");
+    kprintln!("Mapping kernel heap");
 
     // Map the heap
     for page in Page::range_inclusive(heap_start_page, heap_end_page) {
@@ -39,19 +39,19 @@ pub fn init<'a>(
             .expect("Heap page mapping failed");
     }
 
-    println!(
+    kprintln!(
         "HEAP start, page start virt addr: {:?}",
         heap_start_page.start_address()
     );
-    println!(
+    kprintln!(
         "HEAP start, page start phys frame: {:?}",
         recursive_page_table.translate_page(heap_start_page)
     );
-    println!(
+    kprintln!(
         "HEAP end, page start virt addr: {:?}",
         heap_end_page.start_address()
     );
-    println!(
+    kprintln!(
         "HEAP end, page start phys frame: {:?}",
         recursive_page_table.translate_page(heap_end_page)
     );
