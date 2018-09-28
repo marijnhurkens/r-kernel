@@ -1,5 +1,5 @@
 //! # VGA buffer interface
-//! 
+//!
 //!  Interface to write to the VGA buffer.
 use core::fmt;
 use spin::Mutex;
@@ -11,7 +11,7 @@ use volatile::Volatile;
 ///     - clone: add clone trait so the .clone() method can be used
 ///     - copy: give copy behaviour instead of move
 ///     - Eq and PartialEq: add compare behaviour
-/// 
+///
 /// Represent as u8
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,37 +40,37 @@ const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 
 /// Define the VGA buffer.
-/// 
+///
 /// The Volatile crate allows us to wrap a type which allows for volatile memory access.
 /// This enables us to write to the memory without ever using it anywhere else in the program,
 /// normally the Rust compiler woudl optimize thise kind of variables away (the program doesnt
 /// use it so why write tot the memory?).
-/// 
+///
 /// The VGA buffer is a piece of memory-mapped IO, so writing to the VGA buffer directly results
 /// in the contents appearing on screen.
 struct Buffer {
     chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
-/// ColorCode contains 2 valid VGA text mode color: a foreground and background color. 
-/// VGA text mode colors only use 4 bits. The first 4 are used for the foreground color and 
+/// ColorCode contains 2 valid VGA text mode color: a foreground and background color.
+/// VGA text mode colors only use 4 bits. The first 4 are used for the foreground color and
 /// the last 3 or 4 bits are used for the background color. The backgorund color uses the 4th
 /// bit either as a bright but or to set blinking on or off.
-/// 
+///
 /// VGA text mode has 8 colors which can be modified by a bright bit. The 4th bit is the bright bit.
 /// Example: 0011 (0x3) is Cyan, 1011 (0xb) is Light Cyan.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct ColorCode(u8);
 
-/// Here a new color code is created. 
-/// 
+/// Here a new color code is created.
+///
 /// Example, we want white text with a blue background:
-/// 
+///
 /// White: 1111
 /// Blue: 0001
-/// 
+///
 /// Background as u8:   0000 0001
-/// 
+///
 /// Bitshift left 4:    0001 0000
 /// Foreground as u8:   0000 1111
 /// Bitwise OR (|):     0001 1111
@@ -91,7 +91,7 @@ struct ScreenChar {
 
 /// The writer structure saves the current column position in screen
 /// and saves the current color code.
-/// 
+///
 /// Buffer is a mutable reference with a static lifetime
 pub struct Writer {
     column_position: usize,
@@ -100,8 +100,8 @@ pub struct Writer {
 }
 
 /// We currently cant initiate statics which contain raw pointers
-/// (like the buffer) at compile time. This will be possible in the future. 
-/// 
+/// (like the buffer) at compile time. This will be possible in the future.
+///
 /// We use a static here so the write will be available everywhere in the program.
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
@@ -109,7 +109,7 @@ lazy_static! {
         color_code: ColorCode::new(Color::Yellow, Color::Black),
         /// We dont have a heap so we cant use box here.
         /// I dont understand this conversion??
-        /// 
+        ///
         /// 1. cast 0xb8000 as a raw mutable pointer of type buffer (unsafe)
         /// 2. dereference with *(...)
         /// https://doc.rust-lang.org/book/first-edition/raw-pointers.html#references-and-raw-pointers
@@ -120,7 +120,7 @@ lazy_static! {
 
 impl Writer {
     /// Here we implement a byte writer.
-    /// 
+    ///
     /// If the byte is a newline we write a newline.
     /// We also write a newline if the column position exceeds the buffer width.
     pub fn write_byte(&mut self, byte: u8) {
@@ -176,8 +176,8 @@ impl Writer {
             self.buffer.chars[row][col].write(blank);
         }
     }
-    
-    /// Wrap the write byte method. Append a newline and replace unprintable ascii 
+
+    /// Wrap the write byte method. Append a newline and replace unprintable ascii
     /// characters with a square.
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
@@ -199,26 +199,26 @@ impl fmt::Write for Writer {
 
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::vga_buffer::print(format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::device::vga_buffer::print(format_args!($($arg)*)));
 }
 
 #[macro_export]
 macro_rules! println {
     () => (print!("\n"));
-    ($fmt:expr) => (print!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
+    ($fmt:expr) => (print!(concat!( $fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => (print!(concat!( $fmt, "\n"), $($arg)*));
 }
 
 pub fn print(args: fmt::Arguments) {
     use core::fmt::Write;
+
     WRITER.lock().write_fmt(args).unwrap();
 }
 
-
 /// Tests
-/// 
+///
 /// Use a submodule to separate test code form the rest of the module.
-/// Cfg(test) ensures that the code only is compiled when testing. 
+/// Cfg(test) ensures that the code only is compiled when testing.
 #[cfg(test)]
 mod test {
     // Import al parent module items
@@ -231,7 +231,7 @@ mod test {
         Writer {
             column_position: 0,
             color_code: ColorCode::new(Color::Blue, Color::Magenta),
-            // Since we do have a heap in the testing environment we can use box here. 
+            // Since we do have a heap in the testing environment we can use box here.
             buffer: Box::leak(Box::new(buffer)),
         }
     }

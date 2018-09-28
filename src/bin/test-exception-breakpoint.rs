@@ -12,6 +12,7 @@ extern crate lazy_static;
 
 use core::panic::PanicInfo;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use rust_kernel::device;
 use rust_kernel::exit_qemu;
 use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 
@@ -61,8 +62,6 @@ pub fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
-
-
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
@@ -70,7 +69,6 @@ lazy_static! {
         idt
     };
 }
-
 
 // Handle the breakpoint (increment the handler called static integer)
 extern "x86-interrupt" fn breakpoint_handler(_: &mut ExceptionStackFrame) {

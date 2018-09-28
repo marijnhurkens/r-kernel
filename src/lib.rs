@@ -26,13 +26,13 @@ extern crate array_init;
 #[cfg(test)]
 extern crate std;
 
-// Export the modules
+pub mod time;
+
 #[macro_use]
-pub mod vga_buffer;
+pub mod device;
 
 pub mod arch;
-pub mod device;
-pub mod serial;
+
 
 
 pub unsafe fn exit_qemu() {

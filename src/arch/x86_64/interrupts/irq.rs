@@ -1,12 +1,16 @@
 use x86_64::structures::idt::ExceptionStackFrame;
 use x86_64::instructions::port::Port;
 use device::{keyboard, pic8259};
+use time;
 
-
-
+use alloc::sync::Arc;
 
 pub extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
-    //print!(".");
+
+    // This function requires memory to be intialized. But the interrupts are
+    // off until the end of arch init().
+    time::TIME.tick();
+
     unsafe {
         pic8259::PICS
             .lock()

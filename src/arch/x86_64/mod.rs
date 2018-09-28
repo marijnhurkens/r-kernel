@@ -40,5 +40,8 @@ pub fn init(boot_info_addres: usize) {
 
     gdt::init();
     idt::init();
+
+    // We need allocation enabled before initialzing the devices
+    // For example the timer uses allocation
     device::init();
 }

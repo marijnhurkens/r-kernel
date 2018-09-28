@@ -1,4 +1,4 @@
-#![feature(abi_x86_interrupt, alloc, alloc_error_handler)]
+#![feature(abi_x86_interrupt, alloc, alloc_error_handler, euclidean_division)]
 #![no_std] // don't link the Rust standard library
 #![cfg_attr(not(test), no_main)] // disable all Rust-level entry points
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
@@ -36,28 +36,48 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
     println!("Test string contents: {}", t);
     println!("Test string ptr: {:?}", t.as_ptr());
 
-    const VECSIZE: usize = 1024 * 1024 * 9;
+    const VECSIZE: usize = 1024 * 1024 * 1;
     let mut a: Vec<u8> = Vec::with_capacity(VECSIZE);
 
     println!("Allocated vec of size {}", VECSIZE);
 
-    // for i in 0..VECSIZE {
-    //     a.push(i as u8);
-    // }
+    for i in 0..VECSIZE {
+        a.push(i as u8);
+    }
 
-    // println!("Pushed ints to vec." );
+    println!("Pushed ints to vec.");
     println!("Done... to main loop.");
+
+    //println!("{}", rust_kernel::time::TIME.lock().ticks);
+
+    // Todo:
+    // - time system
+    // - context structs and functions for cpu contetx switching
+    // - tasks: processes, create, pid, switch context
+    // - task scheduler
+    // - process communication
+    // - syscalls: handling processes
+    // - create console as process
+    // - filesystem?
+
+    // start console program
+
 
     loop {
         if let Some(key) = KEYBOARD.lock().process_scancode() {
             if let Some(character) = key.character {
                 print!("{}", character);
             } else {
-                println!("{:?}", key)
+                println!("{:?}", key);
             }
         }
+        
+        println!(
+            "Time: {}", (rust_kernel::time::TIME.get_seconds())
+        );
 
-        interrupts::pause();
+
+       interrupts::pause();
     }
 }
 
