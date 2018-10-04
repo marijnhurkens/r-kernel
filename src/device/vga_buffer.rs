@@ -1,7 +1,6 @@
 //! # VGA buffer interface
 //!
 //!  Interface to write to the VGA buffer.
-#[macro_use]
 use core::fmt;
 use spin::Mutex;
 use volatile::Volatile;

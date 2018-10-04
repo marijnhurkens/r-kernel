@@ -59,7 +59,7 @@ pub fn init<'a>(
     // Map the stack
     let stack_allocator = {
         let stack_alloc_start = heap_end_page + 1;
-        let stack_alloc_end = stack_alloc_start + 100;
+        let stack_alloc_end = stack_alloc_start + 100; // 100 pages = 400KB
         let stack_alloc_range = Page::range_inclusive(stack_alloc_start, stack_alloc_end);
         stack_allocator::StackAllocator::new(stack_alloc_range)
     };

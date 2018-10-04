@@ -81,10 +81,10 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
             Finally we return the allocated PhysFrame.
         */
         if let Some(frame) = phys_range.next() {
-            // kprintln!(
-            //     "Allocating fr num: {}, end: {}, frame: {:?}",
-            //     frame_range.start_frame_number, frame_range.end_frame_number, frame
-            // );
+            kprintln!(
+                "Allocating fr num: {}, last available: {}, phys frame: {:?}",
+                frame_range.start_frame_number, frame_range.end_frame_number, frame
+            );
 
             frame_range.start_frame_number =
                 phys_range.start.start_address().as_u64() / frame.size();
@@ -102,3 +102,4 @@ impl FrameDeallocator<Size4KiB> for AreaFrameAllocator {
         unimplemented!()
     }
 }
+

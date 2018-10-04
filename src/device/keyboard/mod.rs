@@ -25,11 +25,11 @@ fn get_key(scancode: u64, scancode_2: Option<u64>) -> Option<Key> {
         };
     }
 
-    return match match_scancode(scancode) {
+    match match_scancode(scancode) {
         Some(KeyEvent::Pressed(key)) => Some(key),
         Some(KeyEvent::Released(key)) => Some(key),
         _ => None,
-    };
+    }
 }
 
 #[derive(Debug)]

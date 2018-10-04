@@ -12,7 +12,6 @@ extern crate lazy_static;
 
 use core::panic::PanicInfo;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use rust_kernel::device;
 use rust_kernel::exit_qemu;
 use x86_64::structures::idt::{ExceptionStackFrame, InterruptDescriptorTable};
 

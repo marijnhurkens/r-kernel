@@ -7,8 +7,8 @@ use linked_list_allocator::Heap;
 use spin::Mutex;
 
 //pub const HEAP_START: u64 = 0o_000_001_000_000_0000;
-pub const HEAP_START: u64 = 0o_010_000_000_000_0000;
-pub const HEAP_SIZE: u64 = 1024 * 1024 * 10; // 10 MB
+pub const HEAP_START: u64 = 0x_400_0000_0000; // 4.398.046.511.104, 4.39TB
+pub const HEAP_SIZE: u64 = 1024; // 1kb
 
 pub struct HeapAllocator {
     inner: Mutex<Heap>,

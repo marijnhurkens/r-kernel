@@ -17,6 +17,7 @@ use rust_kernel::arch;
 use rust_kernel::arch::interrupts;
 use rust_kernel::device::keyboard::KEYBOARD;
 
+
 /// The kernel is compiled using the bootimage and bootloader crates.
 /// The bootloader crate contains the rather difficult setup for x86_64,
 /// this includes setting up long mode (64 bit), enabling paging and various
@@ -34,21 +35,21 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
 
     kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());
 
-    let t = String::from("test");
+    // let t = String::from("test");
 
-    kprintln!("Test string contents: {}", t);
-    kprintln!("Test string ptr: {:?}", t.as_ptr());
+    // kprintln!("Test string contents: {}", t);
+    // kprintln!("Test string ptr: {:?}", t.as_ptr());
 
-    const VECSIZE: usize = 1024 * 1024 * 1;
-    let mut a: Vec<u8> = Vec::with_capacity(VECSIZE);
+    // const VECSIZE: usize = 1024 * 1024 * 1;
+    // let mut a: Vec<u8> = Vec::with_capacity(VECSIZE);
 
-    kprintln!("Allocated vec of size {}", VECSIZE);
+    // kprintln!("Allocated vec of size {}", VECSIZE);
 
-    for i in 0..VECSIZE {
-        a.push(i as u8);
-    }
+    // for i in 0..VECSIZE {
+    //     a.push(i as u8);
+    // }
 
-    kprintln!("Pushed ints to vec.");
+    //kprintln!("Pushed ints to vec.");
     kprintln!("Done... to main loop.");
 
     //kprintln!("{}", rust_kernel::time::TIME.lock().ticks);
