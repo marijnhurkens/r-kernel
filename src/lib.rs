@@ -32,6 +32,7 @@ pub mod time;
 pub mod device;
 
 pub mod arch;
+pub mod sync;
 
 
 

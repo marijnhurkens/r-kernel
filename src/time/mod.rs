@@ -28,10 +28,8 @@ impl Time {
 lazy_static!
 {
     pub static ref TIME: Time = {
-        let time = Time {
+        Time {
             ticks: Arc::new(AtomicUsize::new(0)),
-        };
-
-        time
+        }
     };
 }

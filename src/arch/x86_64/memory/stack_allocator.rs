@@ -26,7 +26,9 @@ impl StackAllocator {
         }
 
         // clone the range, since we only want to change it on success
+        // TODO: can do without clone because PageRangenclusive is copy type?
         let mut range = self.range.clone();
+        //let mut range = self.range;
 
         // try to allocate the stack pages and a guard page
         let guard_page = range.next();

@@ -24,8 +24,7 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
         // Find the next region with type usable
         let region = &mut self.memory_map
             .iter_mut()
-            .filter(|region| region.region_type == MemoryRegionType::Usable && (region.range.end_frame_number - region.range.start_frame_number) > 1)
-            .next();
+            .find(|region| region.region_type == MemoryRegionType::Usable && (region.range.end_frame_number - region.range.start_frame_number) > 1);
 
         // Find the associated frames or error if no region could be found.
         // FrameRange is a c struct with a start and end number.

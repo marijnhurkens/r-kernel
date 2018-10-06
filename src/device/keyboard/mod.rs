@@ -1,7 +1,7 @@
 use alloc::collections::VecDeque;
 /// This package converts a scancode to a keypress
 ///
-use spin::Mutex;
+use sync::irq_lock::IrqLock;
 
 use device::keyboard::helpers::Key::*;
 use device::keyboard::helpers::Modifier::*;
@@ -97,7 +97,7 @@ impl Keyboard {
 }
 
 lazy_static! {
-    pub static ref KEYBOARD: Mutex<Keyboard> = Mutex::new(Keyboard {
+    pub static ref KEYBOARD: IrqLock<Keyboard> = IrqLock::new(Keyboard {
         scancode_buffer: VecDeque::new(),
     });
 }
