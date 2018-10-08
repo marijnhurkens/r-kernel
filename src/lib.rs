@@ -4,7 +4,7 @@
 //! which is convinient for testing.
 #![warn(clippy)]
 #![no_std] // don't link the Rust standard library
-#![feature(abi_x86_interrupt, asm, alloc, allocator_api, alloc_error_handler, min_const_fn)]
+#![feature(abi_x86_interrupt, asm, alloc, allocator_api, alloc_error_handler, min_const_fn, global_asm)]
 
 extern crate bootloader_precompiled;
 extern crate linked_list_allocator;

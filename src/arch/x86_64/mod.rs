@@ -5,6 +5,7 @@ pub mod gdt;
 pub mod idt;
 pub mod interrupts;
 pub mod memory;
+pub mod context;
 mod device;
 
 /// Initialize for the x86_64 architecture
