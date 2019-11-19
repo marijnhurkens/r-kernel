@@ -1,7 +1,15 @@
 ## Setup
 
 ```
+rustup component add llvm-tools-preview
 cargo install bootimage cargo-xbuild
+
+```
+
+## Running in QEMU
+
+```
+cargo xrun
 ```
 
 ## Sources
