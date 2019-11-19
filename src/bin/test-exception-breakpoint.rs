@@ -25,7 +25,7 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
     IDT.load();
 
     // invoke a breakpoint exception
-    x86_64::instructions::int3();
+    x86_64::instructions::interrupts::int3();
 
     // Load the breakpoint called static integer and check if equal to 1
     match BREAKPOINT_HANDLER_CALLED.load(Ordering::SeqCst) {

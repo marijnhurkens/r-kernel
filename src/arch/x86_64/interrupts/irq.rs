@@ -17,7 +17,7 @@ pub extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut Excepti
 }
 
 pub extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
-    let scancodeport = Port::new(0x60);
+    let scancodeport = &mut Port::new(0x60);
 
     let scancode: u8 = unsafe { scancodeport.read() };
 

@@ -1,7 +1,8 @@
-use bootloader_precompiled::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
+use bootloader::bootinfo::{FrameRange, MemoryMap, MemoryRegionType};
 use x86_64::structures::paging::{
-    FrameAllocator, FrameDeallocator, PhysFrame, PhysFrameRange, Size4KiB,
+    FrameAllocator, FrameDeallocator, PhysFrame, frame::PhysFrameRange, Size4KiB,
 };
+use x86_64::PhysAddr;
 
 pub struct AreaFrameAllocator {
     pub memory_map: MemoryMap,
@@ -19,8 +20,8 @@ impl AreaFrameAllocator {
     }
 }
 
-impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
-    fn alloc(&mut self) -> Option<PhysFrame<Size4KiB>> {
+unsafe impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
+    fn allocate_frame(&mut self) -> Option<PhysFrame<Size4KiB>> {
         // Find the next region with type usable
         let region = &mut self.memory_map
             .iter_mut()
@@ -56,7 +57,10 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
         
            3. The same is done for the end address.
         */
-        let mut phys_range = PhysFrameRange::<Size4KiB>::from(*frame_range);
+        let mut phys_range = PhysFrameRange::<Size4KiB> {
+            start: PhysFrame::from_start_address(PhysAddr::new(frame_range.start_addr())).unwrap(),
+            end: PhysFrame::from_start_address(PhysAddr::new(frame_range.end_addr())).unwrap(),
+        };
 
         /*  Here we check if we still have frames left, and if this is the case we
             return the PhysFrame.
@@ -97,7 +101,7 @@ impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
 
 impl FrameDeallocator<Size4KiB> for AreaFrameAllocator {
     #[allow(unused)]
-    fn dealloc(&mut self, frame: PhysFrame<Size4KiB>) {
+    fn deallocate_frame(&mut self, frame: PhysFrame<Size4KiB>) {
         unimplemented!()
     }
 }

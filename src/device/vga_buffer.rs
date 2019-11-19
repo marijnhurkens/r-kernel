@@ -43,8 +43,8 @@ const BUFFER_WIDTH: usize = 80;
 ///
 /// The Volatile crate allows us to wrap a type which allows for volatile memory access.
 /// This enables us to write to the memory without ever using it anywhere else in the program,
-/// normally the Rust compiler woudl optimize thise kind of variables away (the program doesnt
-/// use it so why write tot the memory?).
+/// normally the Rust compiler would optimize thise kind of variables away (the program doesn't
+/// use it so why write to the memory?).
 ///
 /// The VGA buffer is a piece of memory-mapped IO, so writing to the VGA buffer directly results
 /// in the contents appearing on screen.
@@ -182,7 +182,7 @@ impl Writer {
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
-                0x20...0x7e | b'\n' => self.write_byte(byte), // printable ascii or newline
+                0x20..=0x7e | b'\n' => self.write_byte(byte), // printable ascii or newline
                 _ => self.write_byte(0xfe), // print square for non-printable ascii
             }
         }
