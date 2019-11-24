@@ -1,4 +1,4 @@
-#![feature(abi_x86_interrupt, alloc, alloc_error_handler, euclidean_division)]
+#![feature(abi_x86_interrupt, alloc_error_handler)]
 #![no_std] // don't link the Rust standard library
 #![cfg_attr(not(test), no_main)] // disable all Rust-level entry points
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
@@ -6,7 +6,6 @@
 extern crate alloc;
 extern crate bootloader;
 extern crate x86_64;
-
 #[macro_use]
 extern crate rust_kernel;
 
@@ -30,7 +29,7 @@ pub extern "C" fn _start(boot_info_address: usize) -> ! {
     kprintln!("Rust test kernel starting{}", "...");
     kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());
 
-    // Let's init, currently only x86_64 is supported.
+    // Let's init the kernel
     arch::init(boot_info_address);
 
     kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());

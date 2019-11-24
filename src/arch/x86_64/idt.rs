@@ -11,7 +11,7 @@ pub fn init() {
 }
 
 lazy_static! {
-    pub static ref IDT: InterruptDescriptorTable = {
+    static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
 
         idt.breakpoint

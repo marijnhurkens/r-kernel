@@ -99,10 +99,10 @@ pub struct Writer {
     buffer: &'static mut Buffer,
 }
 
-/// We currently cant initiate statics which contain raw pointers
-/// (like the buffer) at compile time. This will be possible in the future.
-///
-/// We use a static here so the write will be available everywhere in the program.
+// We currently cant initiate statics which contain raw pointers
+// (like the buffer) at compile time. This will be possible in the future.
+//
+// We use a static here so the write will be available everywhere in the program.
 lazy_static! {
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,

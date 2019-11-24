@@ -1,12 +1,12 @@
-use x86_64::structures::idt::ExceptionStackFrame;
+use x86_64::structures::idt::InterruptStackFrame;
 use x86_64::instructions::port::Port;
 use device::{keyboard, pic8259};
 use time;
 
-pub extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
+pub extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut InterruptStackFrame) {
 
-    // This function requires memory to be intialized. But the interrupts are
-    // off until the end of arch init().
+    // This function requires memory to be intialized. But the PIC interrupts are
+    // off until the end of arch init() so by now we should have a heap.
     time::TIME.tick();
 
     unsafe {
@@ -16,16 +16,13 @@ pub extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut Excepti
     }
 }
 
-pub extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: &mut ExceptionStackFrame) {
+pub extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: &mut InterruptStackFrame) {
     let scancodeport = &mut Port::new(0x60);
 
     let scancode: u8 = unsafe { scancodeport.read() };
 
     let mut keyboard_guard = keyboard::KEYBOARD.lock();
     keyboard_guard.queue_scancode(scancode);
-
-
-    //kprintln!("Keypress {:?}", key_press);
 
     unsafe {
         pic8259::PICS

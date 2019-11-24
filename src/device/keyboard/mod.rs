@@ -106,10 +106,10 @@ fn match_scancode(scancode: u64) -> Option<KeyEvent> {
     let _idx = scancode as usize;
 
     match scancode {
-        0x02...0x0D => key_press!(LowerAscii(b"1234567890-="[_idx - 0x02])),
-        0x10...0x1B => key_press!(LowerAscii(b"qwertyuiop[]"[_idx - 0x10])),
-        0x1E...0x28 => key_press!(LowerAscii(b"asdfghjkl;'"[_idx - 0x1E])),
-        0x2C...0x35 => key_press!(LowerAscii(b"zxcvbnm,./"[_idx - 0x2C])),
+        0x02..=0x0D => key_press!(LowerAscii(b"1234567890-="[_idx - 0x02])),
+        0x10..=0x1B => key_press!(LowerAscii(b"qwertyuiop[]"[_idx - 0x10])),
+        0x1E..=0x28 => key_press!(LowerAscii(b"asdfghjkl;'"[_idx - 0x1E])),
+        0x2C..=0x35 => key_press!(LowerAscii(b"zxcvbnm,./"[_idx - 0x2C])),
         0x29 => key_press!(LowerAscii(b'`')),
         0x2B => key_press!(LowerAscii(b'\\')),
 

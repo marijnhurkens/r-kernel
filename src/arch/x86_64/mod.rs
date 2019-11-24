@@ -45,4 +45,8 @@ pub fn init(boot_info_addres: usize) {
     // We need allocation enabled before initialzing the devices
     // For example the timer uses allocation
     device::init();
+
+    use x86_64::instructions::interrupts;
+
+    interrupts::enable();
 }

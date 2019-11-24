@@ -17,20 +17,17 @@ pub fn init() {
     }
 }
 
-/// GDT = GlobalDescriptorTable
-/// TSS = TaskStateSegment  
-/// IST = InterruptStackTable contains 7 stacks
-///
-/// Create static TSS, create the IST and include
-/// the double fault stack in the 0th enty of the IST
+// GDT = GlobalDescriptorTable
+// TSS = TaskStateSegment  
+// IST = InterruptStackTable, contains 7 stacks
+//
+// Create static TSS, create the IST and include
+// the double fault stack in the 0th enty of the IST
 lazy_static! {
-    //static ref GDT_STACK: Vec<[u8;STACK_SIZE]> = vec!([0;STACK_SIZE]);
 
     static ref TSS: TaskStateSegment = {
         let mut tss = TaskStateSegment::new();
         tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX as usize] = {
-
-
             // No memory management yet so use a static array.
             // Use a static mutable array so the stack remains
             // readable.
@@ -51,7 +48,7 @@ lazy_static! {
     };
 }
 
-/// Create the global descriptor table.
+// Create the global descriptor table.
 lazy_static! {
     static ref GDT: (GlobalDescriptorTable, Selectors) = {
         let mut gdt = GlobalDescriptorTable::new();

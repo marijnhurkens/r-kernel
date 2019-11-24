@@ -2,9 +2,8 @@
 //!
 //! This file makes it possible to use the kernel as a library
 //! which is convenient for testing.
-#![warn(clippy)]
 #![no_std] // don't link the Rust standard library
-#![feature(abi_x86_interrupt, asm, alloc, allocator_api, alloc_error_handler, min_const_fn, global_asm)]
+#![feature(abi_x86_interrupt, asm, allocator_api, alloc_error_handler, global_asm)]
 
 extern crate bootloader;
 extern crate linked_list_allocator;
@@ -30,11 +29,8 @@ pub mod time;
 
 #[macro_use]
 pub mod device;
-
 pub mod arch;
 pub mod sync;
-
-
 
 pub unsafe fn exit_qemu() {
     use x86_64::instructions::port::Port;

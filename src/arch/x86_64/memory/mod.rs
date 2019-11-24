@@ -1,6 +1,6 @@
 use bootloader::bootinfo::BootInfo;
 use x86_64::structures::paging::{
-    FrameAllocator, mapper::MapToError, Mapper, Page, PageTableFlags, RecursivePageTable, Size4KiB,
+    mapper::MapToError, FrameAllocator, Mapper, Page, PageTableFlags, RecursivePageTable, Size4KiB,
 };
 use x86_64::VirtAddr;
 
@@ -11,8 +11,6 @@ use self::stack_allocator::Stack;
 mod area_frame_allocator;
 pub mod heap;
 mod stack_allocator;
-
-
 
 /// Initializes the memory controller.
 ///
@@ -87,12 +85,11 @@ where
         .allocate_frame()
         .expect("OOM - Cannot allocate frame");
 
-        unsafe {
-    page_table
-        .map_to(page, frame, flags, frame_allocator)?
-        .flush();
-
-        }
+    unsafe {
+        page_table
+            .map_to(page, frame, flags, frame_allocator)?
+            .flush();
+    }
 
     Ok(())
 }

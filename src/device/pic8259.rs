@@ -16,8 +16,5 @@ pub static PICS: spin::Mutex<ChainedPics> =
     spin::Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 
 pub fn init() {
-    use x86_64::instructions::interrupts;
-
     unsafe { PICS.lock().initialize() };
-    interrupts::enable();
 }
