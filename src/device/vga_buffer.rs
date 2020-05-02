@@ -213,14 +213,14 @@ macro_rules! println {
 macro_rules! kprintln {
     () => (print!("\n"));
     ($fmt:expr) => {
-        if $crate::HEAP_ALLOCATOR.get_status() {
+        if $crate::HEAP_ALLOCATOR.lock().size() != 0 {
             println!(concat!("[ {:>4.4} ] ", $fmt), $crate::time::TIME.get_seconds())
         } else {
             println!(concat!("[ no time ] ", $fmt))
         }
     };
     ($fmt:expr, $($arg:tt)*) => {
-         if $crate::HEAP_ALLOCATOR.get_status() {
+         if $crate::HEAP_ALLOCATOR.lock().size() != 0{
             println!(concat!("[ {:>4.4} ] ", $fmt), $crate::time::TIME.get_seconds(), $($arg)*)
          } else {
             println!(concat!("[ no time ] ", $fmt), $($arg)*)

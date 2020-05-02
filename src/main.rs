@@ -27,19 +27,19 @@ use rust_kernel::device::keyboard::KEYBOARD;
 #[no_mangle]
 pub extern "C" fn _start(boot_info_address: usize) -> ! {
     kprintln!("Rust test kernel starting{}", "...");
-    kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());
+    kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.lock().size());
 
     // Let's init the kernel
     arch::init(boot_info_address);
 
-    kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.get_status());
+    kprintln!("Memory status {}", rust_kernel::HEAP_ALLOCATOR.lock().size());
 
     let t = String::from("test");
 
     kprintln!("Test string contents: {}", t);
     kprintln!("Test string ptr: {:?}", t.as_ptr());
 
-    const VECSIZE: usize = 1024 * 1024 * 1;
+    const VECSIZE: usize = 1024 * 2; //2kb
     let mut a: Vec<u8> = Vec::with_capacity(VECSIZE);
 
     kprintln!("Allocated vec of size {}", VECSIZE);

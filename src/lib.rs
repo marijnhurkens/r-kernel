@@ -50,8 +50,8 @@ pub fn rust_oom(info: core::alloc::Layout) -> ! {
     );
 }
 
-use arch::memory::heap::HeapAllocator;
+use linked_list_allocator::LockedHeap;
 
 // Todo: make private
 #[global_allocator]
-pub static HEAP_ALLOCATOR: HeapAllocator = HeapAllocator::new();
+pub static HEAP_ALLOCATOR: LockedHeap = LockedHeap::empty();

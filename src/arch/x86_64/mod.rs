@@ -36,7 +36,7 @@ pub fn init(boot_info_addres: usize) {
     */
     unsafe {
         use self::memory::heap::{HEAP_SIZE, HEAP_START};
-        ::HEAP_ALLOCATOR.init(HEAP_START as usize, HEAP_SIZE as usize);
+        ::HEAP_ALLOCATOR.lock().init(HEAP_START as usize, HEAP_SIZE as usize);
     }
 
     gdt::init();
@@ -46,7 +46,5 @@ pub fn init(boot_info_addres: usize) {
     // For example the timer uses allocation
     device::init();
 
-    use x86_64::instructions::interrupts;
-
-    interrupts::enable();
+    x86_64::instructions::interrupts::enable();
 }
