@@ -1,5 +1,5 @@
 
-use arch::interrupts;
+use crate::arch::interrupts;
 use core::cell::UnsafeCell;
 use core::ops::{Deref, DerefMut, Drop};
 
@@ -43,11 +43,12 @@ impl<T> IrqLock<T> {
     }
 }
 
-// Needed why?
-impl<'a, T: ?Sized> IrqGuard<'a, T> {
-    /// Drops self
-    pub fn release(self) {}
-}
+//
+// // Needed why?
+// impl<'a, T: ?Sized> IrqGuard<'a, T> {
+//     /// Drops self
+//     pub fn release(self) {}
+// }
 
 // Implement the deref operation for the guard
 impl<'a, T: ?Sized> Deref for IrqGuard<'a, T> {

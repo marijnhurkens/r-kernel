@@ -1,4 +1,4 @@
-use arch::x86_64::memory::map_page;
+use crate::arch::x86_64::memory::map_page;
 use x86_64::structures::paging::{
     FrameAllocator, Page, page::PageRangeInclusive, PageSize, PageTableFlags, RecursivePageTable,
     Size4KiB,

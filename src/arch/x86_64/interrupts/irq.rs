@@ -1,11 +1,11 @@
 use x86_64::structures::idt::InterruptStackFrame;
 use x86_64::instructions::port::Port;
-use device::{keyboard, pic8259};
-use time;
+use crate::device::{keyboard, pic8259};
+use crate::time;
 
 pub extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: &mut InterruptStackFrame) {
 
-    // This function requires memory to be intialized. But the PIC interrupts are
+    // This function requires memory to be initialized. But the PIC interrupts are
     // off until the end of arch init() so by now we should have a heap.
     time::TIME.tick();
 

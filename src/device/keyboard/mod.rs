@@ -1,12 +1,10 @@
 use alloc::collections::VecDeque;
-/// This package converts a scancode to a keypress
-///
-use sync::irq_lock::IrqLock;
 
-use device::keyboard::helpers::Key::*;
-use device::keyboard::helpers::Modifier::*;
-use device::keyboard::helpers::Other::*;
-use device::keyboard::helpers::{Key, KeyEvent, STATE};
+use crate::device::keyboard::helpers::{Key, KeyEvent, STATE};
+use crate::device::keyboard::helpers::Key::*;
+use crate::device::keyboard::helpers::Modifier::*;
+use crate::device::keyboard::helpers::Other::*;
+use crate::sync::irq_lock::IrqLock;
 
 #[macro_use]
 pub mod helpers;
@@ -15,7 +13,7 @@ pub struct Keyboard {
     scancode_buffer: VecDeque<u8>,
 }
 
-// Removes keyevent layer -> key
+// Removes key event layer -> key
 fn get_key(scancode: u64, scancode_2: Option<u64>) -> Option<Key> {
     if let Some(scancode_2) = scancode_2 {
         return match match_special_scancode(scancode_2) {

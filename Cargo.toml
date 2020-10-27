@@ -3,6 +3,7 @@ name = "rust_kernel"
 version = "0.1.0"
 authors = ["Marijn Hurkens <marijnhurkens@gmail.com>"]
 default-run = "rust_kernel"
+edition = "2018"
 
 [dependencies]
 bootloader = { version = "0.9.8", features = ["map_physical_memory", "recursive_page_table"]}

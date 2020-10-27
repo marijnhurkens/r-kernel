@@ -92,3 +92,13 @@ pub fn panic(info: &PanicInfo) -> ! {
     kprintln!("{}", info);
     loop {}
 }
+
+
+async fn async_number() -> u32 {
+    42
+}
+
+async fn example_task() {
+    let number = async_number().await;
+    println!("async number: {}", number);
+}

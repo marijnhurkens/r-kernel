@@ -9,13 +9,13 @@ pub mod context;
 mod device;
 
 /// Initialize for the x86_64 architecture
-pub fn init(boot_info_addres: usize) {
+pub fn init(boot_info_address: usize) {
     // We get an address to the boot info from the bootloader, let's cast
     // it to a struct.
-    let _boot_info: &BootInfo = unsafe { &*(boot_info_addres as *mut BootInfo) };
+    let _boot_info: &BootInfo = unsafe { &*(boot_info_address as *mut BootInfo) };
 
     // The bootloader which was compiled by the bootimage crate appends a
-    // version. This verison must match the crate we use in the kernel.
+    // version. This version must match the crate we use in the kernel.
     // if _boot_info.check_version().is_err() {
     //     panic!("os_bootinfo version passed by bootloader does not match crate version!");
     // }
@@ -36,7 +36,7 @@ pub fn init(boot_info_addres: usize) {
     */
     unsafe {
         use self::memory::heap::{HEAP_SIZE, HEAP_START};
-        ::HEAP_ALLOCATOR.lock().init(HEAP_START as usize, HEAP_SIZE as usize);
+        crate::HEAP_ALLOCATOR.lock().init(HEAP_START as usize, HEAP_SIZE as usize);
     }
 
     gdt::init();

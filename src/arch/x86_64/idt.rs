@@ -4,7 +4,7 @@ use x86_64::structures::idt::InterruptDescriptorTable;
 
 use super::gdt;
 use super::interrupts::{exceptions, irq};
-use device::pic8259;
+use crate::device::pic8259;
 
 pub fn init() {
     IDT.load();
