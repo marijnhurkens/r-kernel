@@ -6,14 +6,14 @@ pub mod irq;
 #[inline(always)]
 pub fn pause() {
     unsafe {
-        asm!("pause");
+        llvm_asm!("pause");
     }
 }
 
 #[inline(always)]
 pub fn interrupts_disable() {
     unsafe {
-        asm!("cli" : : : : "intel", "volatile");
+        llvm_asm!("cli" : : : : "intel", "volatile");
     }
 }
 
@@ -26,6 +26,6 @@ pub fn interrupts_enable() {
     unsafe {
         // Enable interrupts and perform noop because interrupts
         // are only handled after next instruction.
-        asm!("sti; nop" : : : : "intel", "volatile");
+        llvm_asm!("sti; nop" : : : : "intel", "volatile");
     }
 }

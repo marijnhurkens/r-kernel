@@ -77,7 +77,7 @@ pub fn map_page<'a, A>(
     flags: PageTableFlags,
     page_table: &mut RecursivePageTable<'a>,
     frame_allocator: &mut A,
-) -> Result<(), MapToError>
+) -> Result<(), MapToError<Size4KiB>>
 where
     A: FrameAllocator<Size4KiB>,
 {

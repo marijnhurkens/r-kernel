@@ -5,20 +5,17 @@ authors = ["Marijn Hurkens <marijnhurkens@gmail.com>"]
 default-run = "rust_kernel"
 
 [dependencies]
-bootloader = { version = "0.8.0", features = ["map_physical_memory", "recursive_page_table"]}
+bootloader = { version = "0.9.8", features = ["map_physical_memory", "recursive_page_table"]}
 volatile = "0.2.6"
 spin = "0.5.2"
-uart_16550 = "0.1.0"
-x86_64 = "0.7.5"
-pic8259_simple = "0.1.1"
+uart_16550 = "0.2.10"
+x86_64 =  "0.12.1"
+pic8259_simple = "0.2.0"
 once = "0.3.3"
-linked_list_allocator = "0.8.3"
+linked_list_allocator = "0.8.6"
 
 [dev-dependencies]
 array-init = "0.0.3"
-
-[package.metadata.bootimage]
-default-target = "x86_64-rust_kernel.json"
 
 [dependencies.lazy_static]
 version = "1.0"

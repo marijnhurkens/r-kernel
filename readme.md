@@ -1,16 +1,25 @@
 ## Setup
 
+### Prerequisites 
+Ensure qemu is installed.
+
 ```
 rustup component add llvm-tools-preview
 cargo install bootimage cargo-xbuild
-
 ```
 
 ## Running in QEMU
 
 ```
-cargo xrun
+make all
 ```
+
+## Done
+Nothing...
+
+## Todo
+A lot...
+
 
 ## Sources
 

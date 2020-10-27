@@ -101,7 +101,7 @@ unsafe impl FrameAllocator<Size4KiB> for AreaFrameAllocator {
 
 impl FrameDeallocator<Size4KiB> for AreaFrameAllocator {
     #[allow(unused)]
-    fn deallocate_frame(&mut self, frame: PhysFrame<Size4KiB>) {
+    unsafe fn deallocate_frame(&mut self, frame: PhysFrame<Size4KiB>) {
         unimplemented!()
     }
 }

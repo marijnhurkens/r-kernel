@@ -8,7 +8,7 @@ pub extern "x86-interrupt" fn breakpoint_handler(stack_frame: &mut InterruptStac
 pub extern "x86-interrupt" fn double_fault_handler(
     stack_frame: &mut InterruptStackFrame,
     _error_code: u64,
-) {
+) -> ! {
     kprintln!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
     loop {}
 }
